@@ -1,3 +1,5 @@
+[![Deploy to Azure Functions](https://github.com/dyammarcano/hello-world-function/actions/workflows/azure.yml/badge.svg)](https://github.com/dyammarcano/hello-world-function/actions/workflows/azure.yml)
+
 # Example of using GitHub Actions to deploy a function app to Azure
 
 This is a sample project that shows how to use GitHub Actions to deploy a function app to Azure.
