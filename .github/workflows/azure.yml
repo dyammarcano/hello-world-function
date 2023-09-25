@@ -1,12 +1,46 @@
 name: Deploy to Azure Functions
 
+env:
+  AZURE_WEBAPP_NAME: your-app-name    # set this to the name of your Azure Web App
+  JAVA_VERSION: '11'                  # set this to the Java version to use
+  DISTRIBUTION: zulu                  # set this to the Java distribution
+
 on:
   create:
     tags:
       - '*' # Deploy on any tag
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for Dependabot
+
+      - name: Setup Java Sdk ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.DISTRIBUTION }}
+          cache: maven
+
+      - name: Check Maven version
+        run: mvn -version
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: java-functions-app
+          path: '${{ github.workspace }}/target/*.zip'
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -15,27 +49,13 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
         with:
-          fetch-depth: 0 # Fetch all history for Dependabot
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          check-latest: true
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Check maven version
-        run: mvn -version
-
-      - name: Build with Maven
-        run: mvn clean package
+          name: java-functions-app
 
       - name: Azure Functions Action
-        uses: Azure/functions-action@v1.5.1
+        uses: Azure/functions-action@v1
         with:
-          app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
