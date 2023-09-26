@@ -1,9 +1,9 @@
 name: Deploy to Azure Functions
 
 env:
-  AZURE_WEBAPP_NAME: your-app-name    # set this to the name of your Azure Web App
-  JAVA_VERSION: '17'                  # set this to the Java version to use
-  DISTRIBUTION: zulu                  # set this to the Java distribution
+  AZURE_WEBAPP_NAME: azure-function-app # set this to the name of your Azure Web App
+  JAVA_VERSION: '17'                    # set this to the Java version to use
+  DISTRIBUTION: zulu                    # set this to the Java distribution
 
 on:
   create:
@@ -31,13 +31,18 @@ jobs:
         run: mvn -version
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean package
+
+      - name: Create Zip File
+        run: |
+          cd ${{ github.workspace }}/target/azure-functions/${{ env.AZURE_WEBAPP_NAME }}
+          zip -r ${{ github.workspace }}/${{ env.AZURE_WEBAPP_NAME }}.zip .
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
-          name: java-functions-app
-          path: '${{ github.workspace }}/target/*.zip'
+          name: ${{ env.AZURE_WEBAPP_NAME }}
+          path: ${{ github.workspace }}/${{ env.AZURE_WEBAPP_NAME }}.zip
 
   deploy:
     needs: build
@@ -52,7 +57,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
-          name: java-functions-app
+          name: ${{ env.AZURE_WEBAPP_NAME }}
 
       - name: Azure Functions Action
         uses: Azure/functions-action@v1
