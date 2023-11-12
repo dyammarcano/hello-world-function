@@ -2,29 +2,62 @@ package org.example.functions.dto;
 
 import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson;
 import lombok.Data;
+import org.example.functions.Constants;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
 
 @Data
 public class EventDto {
+    private String id;
     private String topic;
     private String subject;
     private String eventType;
-    private String id;
-    private DataDto data;
     private String dataVersion;
     private String metadataVersion;
     private String eventTime;
+    private DataDto data;
+    private boolean arqsAguardando;
+    private boolean arqsRetorno;
 
-    public EventDto deserializeEvent(String message) {
-        EventDto eventDto = new Gson().fromJson(message, EventDto.class);
-        this.topic = eventDto.getTopic();
-        this.subject = eventDto.getSubject();
-        this.eventType = eventDto.getEventType();
+    public EventDto(String message) {
+        EventDto eventDto = new Gson().fromJson(message, this.getClass());
         this.id = eventDto.getId();
         this.data = eventDto.getData();
+        this.topic = eventDto.getTopic();
+        this.subject = eventDto.getSubject();
+        this.eventTime = eventDto.getEventTime();
+        this.eventType = eventDto.getEventType();
         this.dataVersion = eventDto.getDataVersion();
         this.metadataVersion = eventDto.getMetadataVersion();
-        this.eventTime = eventDto.getEventTime();
+    }
 
-        return this;
+    public Optional<Participant> checkParticipant() {
+        if (this.data != null) {
+            arqsRetorno = this.data.getBlobUrl().contains(Constants.ARQ_RETORNO);
+            arqsAguardando = this.data.getBlobUrl().contains(Constants.ARQ_AGUARDANDO);
+
+            try {
+                URL urlObj = new URL(this.data.getBlobUrl());
+                String path = urlObj.getPath().substring(1);
+
+                String[] parts = path.split("/");
+
+                if (parts.length >= 3) {
+                    Participant participant = Participant.builder()
+                            .account(parts[0])
+                            .filepath(String.format("%s/%s", parts[1], parts[2]))
+                            .build();
+                    return Optional.of(participant);
+                } else {
+                    return Optional.empty();
+                }
+
+            } catch (MalformedURLException e) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
     }
 }
