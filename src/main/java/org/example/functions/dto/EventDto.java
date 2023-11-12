@@ -18,8 +18,8 @@ public class EventDto {
     private String metadataVersion;
     private String eventTime;
     private DataDto data;
-    private boolean arqsAguardando;
     private boolean arqsRetorno;
+    private boolean arqsAguardando;
 
     public EventDto(String message) {
         EventDto eventDto = new Gson().fromJson(message, this.getClass());
@@ -40,9 +40,7 @@ public class EventDto {
 
             try {
                 URL urlObj = new URL(this.data.getBlobUrl());
-                String path = urlObj.getPath().substring(1);
-
-                String[] parts = path.split("/");
+                String[] parts = urlObj.getPath().substring(1).split("/");
 
                 if (parts.length >= 3) {
                     Participant participant = Participant.builder()
@@ -53,7 +51,6 @@ public class EventDto {
                 } else {
                     return Optional.empty();
                 }
-
             } catch (MalformedURLException e) {
                 return Optional.empty();
             }
