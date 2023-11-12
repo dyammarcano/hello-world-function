@@ -19,7 +19,7 @@ class ParticipantTest {
 
         if (participant.isPresent()) {
             assertEquals("05000005", participant.get().account);
-            assertEquals("ArqsAguardando/ARQ0001_CDB_INCL-SIRC.txt", participant.get().filepath);
+            assertEquals("ArqsAguardando/ARQ0001_CDB_INCL-SIRC.txt", participant.get().filename);
             assertEquals("https://storageaccountfordatapoc.blob.core.windows.net/05000005/ArqsAguardando/ARQ0001_CDB_INCL-SIRC.txt", eventDto.getData().getBlobUrl());
         }
 
@@ -28,7 +28,7 @@ class ParticipantTest {
 
         if (participant.isPresent()) {
             assertEquals("03483002", participant.get().account);
-            assertEquals("ArqsAguardando/ARQ0001_RDB_SEMC-SIRC.txt", participant.get().filepath);
+            assertEquals("ArqsAguardando/ARQ0001_RDB_SEMC-SIRC.txt", participant.get().filename);
             assertEquals("https://storageaccountfordatapoc.blob.core.windows.net/03483002/ArqsAguardando/ARQ0001_RDB_SEMC-SIRC.txt", eventDto.getData().getBlobUrl());
         }
 

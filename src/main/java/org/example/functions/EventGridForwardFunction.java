@@ -19,7 +19,7 @@ public class EventGridForwardFunction {
 
         if (participant.isPresent()) {
             context.getLogger().info("Account: " + participant.get().getAccount());
-            context.getLogger().info("Filepath: " + participant.get().getFilepath());
+            context.getLogger().info("Filepath: " + participant.get().getFilename());
         }
     }
 }

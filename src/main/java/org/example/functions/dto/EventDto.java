@@ -45,7 +45,7 @@ public class EventDto {
                 if (parts.length >= 3) {
                     Participant participant = Participant.builder()
                             .account(parts[0])
-                            .filepath(String.format("%s/%s", parts[1], parts[2]))
+                            .filename(parts[2])
                             .build();
                     return Optional.of(participant);
                 } else {

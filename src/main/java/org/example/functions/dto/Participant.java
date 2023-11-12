@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 public class Participant {
     String account;
-    String filepath;
+    String filename;
 }
